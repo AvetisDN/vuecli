@@ -4,6 +4,9 @@ import router from './router'
 import store from './store'
 import firebase from 'firebase'
 import './registerServiceWorker'
+import NProgress from 'nprogress'
+
+import '../node_modules/nprogress/nprogress.css'
 
 Vue.config.productionTip = false
 
@@ -20,6 +23,19 @@ const config = {
 firebase.initializeApp(config)
 
 export const db = firebase.firestore()
+
+// eslint-disable-next-line
+router.beforeResolve((to, from, next) => {
+  if (to.name) {
+      NProgress.start()
+  }
+  next()
+})
+
+// eslint-disable-next-line
+router.afterEach((to, from) => {
+  NProgress.done()
+})
 
 new Vue({
   router,
