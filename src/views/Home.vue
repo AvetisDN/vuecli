@@ -4,6 +4,19 @@
     <div class="title">What do I need to do today?</div>
     <input v-model="myTodo" /><button @click="addToDo">Add</button>
     <div v-if="errors !== ''" id="errors">{{ errors }}</div>
+
+    <div v-if="this.$store.getters.getItems && this.$store.getters.getItems.length > 0">
+
+      <div class="title">Today, you've go to do...</div>
+
+      <div v-for="item in this.$store.getters.getItems" :key="item.id">
+        <p>
+          {{ item.title }} <small style="text-decoration:underline; cursor: pointer" @click="deleteItem(item.id)">Delete</small>
+        </p>
+      </div>
+
+    </div>
+
   </div>
 </template>
 
@@ -11,6 +24,9 @@
   import { db } from '@/main'
   export default {
     name: 'home',
+    beforeCreate: function () {
+      this.$store.dispatch('setItems')
+    },
     data: function () {
       return {
         myTodo: '',
@@ -34,6 +50,17 @@
           })
         } else {
           this.errors = 'Please enter some text'
+        }
+      },
+      deleteItem: function (id) {
+        if (id) {
+          db.collection("items").doc(id).delete().then(function() {
+            // console.log('Document successfully deleted')
+          }).catch(function(error) {
+            this.error = error
+          })
+        } else {
+          this.error = 'Invalid ID'
         }
       }
     }
